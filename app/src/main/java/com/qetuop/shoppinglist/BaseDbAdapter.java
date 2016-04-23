@@ -17,6 +17,7 @@ public class BaseDbAdapter {
     public DatabaseHelper mDatabaseHelper; // not thread safe?
     //protected static DatabaseHelper mDatabaseHelper; // more thread safe?
     protected SQLiteDatabase mDb;
+    protected final Context mCtx;
 
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -46,8 +47,11 @@ public class BaseDbAdapter {
             + COLUMN_ITEM_NAME + " text not null "
             + ")";
 
-    protected final Context mCtx;
-
+    //----------------------------------------------------------------------------------------------
+    //
+    //                              SQLiteOpenHelper
+    //
+    //----------------------------------------------------------------------------------------------
     protected static class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(Context context) {
@@ -60,7 +64,7 @@ public class BaseDbAdapter {
         public void onCreate(SQLiteDatabase db) {
             Log.d(LOG, "onCreate");
 
-            db.execSQL(TABLE_ITEM);
+            db.execSQL(CREATE_TABLE_ITEM);
 
             // requires API 16
 //            db.setForeignKeyConstraintsEnabled(true); // ?finish transactions ??
@@ -78,7 +82,13 @@ public class BaseDbAdapter {
 
             onCreate(db);
         }
-    }
+    } // DatabaseHelper
+    //----------------------------------------------------------------------------------------------
+    //
+    //                              SQLiteOpenHelper
+    //
+    //----------------------------------------------------------------------------------------------
+
 
     public BaseDbAdapter(Context ctx) {
         this.mCtx = ctx;
@@ -93,8 +103,8 @@ public class BaseDbAdapter {
         return this;
     }
 
-/*    concurrent issue?
-public SQLiteDatabase open() throws SQLException {
+    /*    concurrent issue?
+    public SQLiteDatabase open() throws SQLException {
         Log.d(LOG, "open");
 
         if (mDatabaseHelper == null) {
@@ -110,4 +120,4 @@ public SQLiteDatabase open() throws SQLException {
         mDatabaseHelper.close();
     }
 
-}
+} // BaseDbAdapter
