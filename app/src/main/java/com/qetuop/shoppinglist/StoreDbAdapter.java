@@ -21,37 +21,37 @@ public class StoreDbAdapter extends BaseDbAdapter
         super(ctx);
     }
 
-    public long insert(Item value) {
+    public long insert(Store value) {
         long id = 0;
 
         ContentValues args = new ContentValues();
 
-        args.put(COLUMN_ITEM_NAME, value.getName());
+        args.put(COLUMN_STORE_NAME, value.getName());
 
-        id = mDb.insert(TABLE_ITEM, null, args);
+        id = mDb.insert(TABLE_STORE, null, args);
         value.setId(id);
 
         return id;
     }
 
     // convert a "ptr/cursor" of a table entry to an object
-    public Item cursorToObject(Cursor cursor) {
-        Item obj = new Item();
+    public Store cursorToObject(Cursor cursor) {
+        Store obj = new Store();
 
         obj.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID))); // why can't get?
-        obj.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ITEM_NAME)));
+        obj.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STORE_NAME)));
 
         return obj;
     }
 
-    private Item get(String selection, String[] selectionArgs) {
-        Item obj = new Item();
+    private Store get(String selection, String[] selectionArgs) {
+        Store obj = new Store();
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder = null;
 
         Cursor cursor = mDb.query(
-                TABLE_ITEM,  // The table to query
+                TABLE_STORE,  // The table to query
                 projection,                               // The columns to return
                 selection,                                // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
@@ -71,25 +71,25 @@ public class StoreDbAdapter extends BaseDbAdapter
     }
 
     // READ
-    public Item getId(long id) {
+    public Store getId(long id) {
         String selection = COLUMN_ID + "=?";
         String[] selectionArgs = {String.valueOf(id)};
 
         return get(selection, selectionArgs);
     }
 
-    public Item getName(String name) {
-        String selection = COLUMN_ITEM_NAME + "=?";
+    public Store getName(String name) {
+        String selection = COLUMN_STORE_NAME + "=?";
         String[] selectionArgs = {name};
 
         return get(selection, selectionArgs);
     }
 
-    public List<Item> getAll() {
-        List<Item> objs = new ArrayList<>();
+    public List<Store> getAll() {
+        List<Store> objs = new ArrayList<>();
 
         Cursor cursor = mDb.query(
-                TABLE_ITEM,
+                TABLE_STORE,
                 projection,
                 null,
                 null,
@@ -99,7 +99,7 @@ public class StoreDbAdapter extends BaseDbAdapter
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Item obj = cursorToObject(cursor);
+            Store obj = cursorToObject(cursor);
             objs.add(obj);
             cursor.moveToNext();
         }
@@ -112,7 +112,7 @@ public class StoreDbAdapter extends BaseDbAdapter
     public Cursor getAllCursor() {
 
         Cursor cursor = mDb.query(
-                TABLE_ITEM,
+                TABLE_STORE,
                 projection,
                 null,
                 null,
@@ -126,17 +126,17 @@ public class StoreDbAdapter extends BaseDbAdapter
     }
 
     // UPDATE
-    public void update(long id, Item obj) {
+    public void update(long id, Store obj) {
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_ITEM_NAME, obj.getName());
+        values.put(COLUMN_STORE_NAME, obj.getName());
 
         // Which row to update, based on the ID
         String selection = COLUMN_ID + " LIKE ?";
         String[] selectionArgs = { String.valueOf(id) };
 
         int count = mDb.update(
-                TABLE_ITEM,
+                TABLE_STORE,
                 values,
                 selection,
                 selectionArgs);
@@ -144,10 +144,10 @@ public class StoreDbAdapter extends BaseDbAdapter
 
     private void remove(String[] selectionArgs) {
         // Define 'where' part of query.
-        String selection = COLUMN_ITEM_NAME + " LIKE ?";
+        String selection = COLUMN_STORE_NAME + " LIKE ?";
 
         // Issue SQL statement.
-        mDb.delete(TABLE_ITEM, selection, selectionArgs);
+        mDb.delete(TABLE_STORE, selection, selectionArgs);
     }
 
     // DESTROY - name
@@ -163,10 +163,10 @@ public class StoreDbAdapter extends BaseDbAdapter
     }
 
     public void removeAll() {
-        List<Item> objs = getAll();
-        for ( Item obj : objs ) {
+        List<Store> objs = getAll();
+        for ( Store obj : objs ) {
             removeId(obj.getId());
         }
     }
 
-} // ItemDbAdapter
+} // StoreDbAdapter

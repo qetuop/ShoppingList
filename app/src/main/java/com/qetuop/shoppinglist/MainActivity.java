@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     // Database accessors
     private BaseDbAdapter mBaseDbAdapter;
     private ItemDbAdapter mItemDbAdapter;
+    private StoreDbAdapter mStoreDbAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (SQLException e) {
             Log.e(TAG, "item table open error");
         }
+
+        mStoreDbAdapter = new StoreDbAdapter(this);
+        try {
+            mStoreDbAdapter.open();
+        } catch (SQLException e) {
+            Log.e(TAG, "store table open error");
+        }
     }
 
     private void hardcodedSetup() {
@@ -94,11 +104,29 @@ public class MainActivity extends AppCompatActivity {
         ////// --------------------------- //////
 
         ////// Hardcode some exercieses //////
-        mItemDbAdapter.removeAll();
+        //mItemDbAdapter.removeAll();
 
-        // Create
-        Item item = new Item("Milk");
-        long id = mItemDbAdapter.insert(item);
+        // Create Items
+        String[] tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
+                "ice cream", "apples", "chicken", "french fries"};
+        ArrayList<String> list = new ArrayList<String>();
+        list.addAll( Arrays.asList(tmp) );
+        for ( String s : list ) {
+            Item item = new Item(s);
+            long id = mItemDbAdapter.insert(item);
+        }
+
+        // Create Items
+        tmp = new String[] { "Giant", "Safeway"};
+        list = new ArrayList<String>();
+        list.addAll( Arrays.asList(tmp) );
+        for ( String s : list ) {
+            Store store = new Store(s);
+            long id = mStoreDbAdapter.insert(store);
+        }
+
+        //Item item = new Item("Milk");
+        //long id = mItemDbAdapter.insert(item);
 
 //
 //        Exercise ex1 = mExerciseDbAdapter.getExercise("Bench Press");
