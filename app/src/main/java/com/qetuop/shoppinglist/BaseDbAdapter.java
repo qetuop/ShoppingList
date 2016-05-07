@@ -42,7 +42,7 @@ public class BaseDbAdapter {
     // Aisle Table Columns
     public static final String COLUMN_AISLE_STORE_ID = "store_id";
     public static final String COLUMN_AISLE_ITEM_ID = "item_id";
-    public static final String COLUMN_AISLE_AISLE_NAME = "aisle_name";
+    public static final String COLUMN_AISLE_NAME = "aisle_name";
 
     //
     //private static final String TEXT_TYPE = " TEXT";
@@ -66,7 +66,7 @@ public class BaseDbAdapter {
     private static final String CREATE_TABLE_AISLE = "CREATE TABLE "
             + TABLE_AISLE+ "("
             + COLUMN_ID + " integer primary key autoincrement, "
-            + COLUMN_AISLE_AISLE_NAME + " text not null, "
+            + COLUMN_AISLE_NAME + " text not null, "
             + COLUMN_AISLE_STORE_ID + " integer not null,"
             + COLUMN_AISLE_ITEM_ID + " integer not null,"
             + " FOREIGN KEY ("+COLUMN_AISLE_STORE_ID+") REFERENCES "+TABLE_STORE+"("+COLUMN_ID+")  ON DELETE CASCADE, "
