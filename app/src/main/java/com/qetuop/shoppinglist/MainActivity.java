@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -169,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
 
         final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
 
-        String[] myStringArray = {"A", "B", "C"};
+        String[] myStringArray = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"};
+        //String[] myStringArray = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         ArrayAdapter<String> myAdapter = new
                 ArrayAdapter<String>(
                 this,
@@ -189,7 +192,12 @@ public class MainActivity extends AppCompatActivity {
     } // update
 
 
+    // if text entry is blank, bring up selection list
     public void addItem(View view) {
+        EditText itemEt = (EditText) findViewById(R.id.content_main_et_message);
+        String s = itemEt.getText().toString();
+        System.out.println("Text= " + s);
+
 //        Intent intent = new Intent(this, WorkoutActivity.class);
 //        //long l = 0l;
 //        intent.putExtra(EXTRA_MESSAGE, 0l);

@@ -12,7 +12,7 @@ import java.sql.SQLException;
  */
 public class BaseDbAdapter {
 
-    protected static final String LOG = "BaseDbAdapter";
+    protected static final String TAG = "BaseDbAdapter";
 
     public DatabaseHelper mDatabaseHelper; // not thread safe?
     //protected static DatabaseHelper mDatabaseHelper; // more thread safe?
@@ -20,23 +20,32 @@ public class BaseDbAdapter {
     protected final Context mCtx;
 
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 6;
 
     // Database Name
     private static final String DATABASE_NAME = "shopingList.db";
 
-    // Table Item
+    // Table Names
     public static final String TABLE_ITEM = "item";
+    public static final String TABLE_STORE = "store";
+    public static final String TABLE_AISLE = "aisle";
 
-    // Common Columns
+    // Columns
     public static final String COLUMN_ID = "_id"; // use BaseColumns._ID or create class that implements it? Contract class?
 
-    // Item Table
+    // Item Table Columns
     public static final String COLUMN_ITEM_NAME = "name";
 
+    // Store Table Columns
+    public static final String COLUMN_STORE_NAME = "name";
 
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String COMMA_SEP = ",";
+    // Aisle Table Columns
+    public static final String COLUMN_AISLE_STORE_ID = "store_id";
+    public static final String COLUMN_ITEM_STORE_ID = "item_id";
+
+    //
+    //private static final String TEXT_TYPE = " TEXT";
+    //private static final String COMMA_SEP = ",";
 
     // Table Create Statements
 
@@ -45,6 +54,22 @@ public class BaseDbAdapter {
             + TABLE_ITEM+ "("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_ITEM_NAME + " text not null "
+            + ")";
+
+    private static final String CREATE_TABLE_STORE = "CREATE TABLE "
+            + TABLE_STORE+ "("
+            + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_STORE_NAME + " text not null "
+            + ")";
+
+    private static final String CREATE_TABLE_AISLE = "CREATE TABLE "
+            + TABLE_AISLE+ "("
+            + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_AISLE_STORE_ID + " integer not null,"
+            + COLUMN_ITEM_STORE_ID + " integer not null,"
+            + " FOREIGN KEY ("+COLUMN_AISLE_STORE_ID+") REFERENCES "+TABLE_STORE+"("+COLUMN_ID+")  ON DELETE CASCADE, "
+            + " FOREIGN KEY ("+COLUMN_ITEM_STORE_ID+")  REFERENCES "+TABLE_ITEM+"("+COLUMN_ID+")  ON DELETE CASCADE "
+
             + ")";
 
     //----------------------------------------------------------------------------------------------
@@ -57,21 +82,25 @@ public class BaseDbAdapter {
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
-            Log.d(LOG, "ctor");
+            Log.d(TAG, "ctor");
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            Log.d(LOG, "onCreate");
+            Log.d(TAG, "onCreate");
 
             db.execSQL(CREATE_TABLE_ITEM);
+            db.execSQL(CREATE_TABLE_STORE);
+            db.execSQL(CREATE_TABLE_AISLE);
 
-            // requires API 16
-//            db.setForeignKeyConstraintsEnabled(true); // ?finish transactions ??
+            // requires min API 16 - probably using min 15
+            //db.setForeignKeyConstraintsEnabled(true); // ?finish transactions ??
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            Log.d(TAG, "onUpgrade");
+
             Log.w(this.getClass().getName(),
                     "Upgrading database from version " + oldVersion + " to "
                             + newVersion + ", which will destroy all old data");
@@ -79,6 +108,8 @@ public class BaseDbAdapter {
             // create backup first?
 
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_STORE);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_AISLE);
 
             onCreate(db);
         }
@@ -95,17 +126,22 @@ public class BaseDbAdapter {
     }
 
     public BaseDbAdapter open() throws SQLException {
-        Log.d(LOG, "open");
+        Log.d(TAG, "open");
 
         mDatabaseHelper = new DatabaseHelper(mCtx);
         mDb = mDatabaseHelper.getWritableDatabase();
+
+        // Enable foreign key constraints
+        if (!mDb.isReadOnly()) {
+            mDb.execSQL("PRAGMA foreign_keys = ON;");
+        }
 
         return this;
     }
 
     /*    concurrent issue?
     public SQLiteDatabase open() throws SQLException {
-        Log.d(LOG, "open");
+        Log.d(TAG, "open");
 
         if (mDatabaseHelper == null) {
             mDatabaseHelper = new DatabaseHelper(mCtx);
