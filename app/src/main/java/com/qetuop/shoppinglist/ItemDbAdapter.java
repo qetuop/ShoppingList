@@ -3,6 +3,7 @@ package com.qetuop.shoppinglist;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.List;
  */
 public class ItemDbAdapter extends BaseDbAdapter
 {
+    protected static final String TAG = "ItemDbAdapter";
+
     private String[] projection = {
             COLUMN_ID,
             COLUMN_ITEM_NAME
@@ -19,6 +22,7 @@ public class ItemDbAdapter extends BaseDbAdapter
 
     public ItemDbAdapter(Context ctx) {
         super(ctx);
+        Log.d(TAG, "ItemDbAdapter::ctor");
     }
 
     public long insert(Item value) {

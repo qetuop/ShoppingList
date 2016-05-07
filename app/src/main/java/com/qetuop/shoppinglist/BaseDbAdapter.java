@@ -14,13 +14,13 @@ public class BaseDbAdapter {
 
     protected static final String TAG = "BaseDbAdapter";
 
-    public DatabaseHelper mDatabaseHelper; // not thread safe?
-    //protected static DatabaseHelper mDatabaseHelper; // more thread safe?
-    protected SQLiteDatabase mDb;
+    //public DatabaseHelper mDatabaseHelper; // not thread safe?
+    protected static DatabaseHelper mDatabaseHelper; // more thread safe?
+    protected static SQLiteDatabase mDb; // TODO: should this be static?
     protected final Context mCtx;
 
     // Database Version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
 
     // Database Name
     private static final String DATABASE_NAME = "shopingList.db";
@@ -41,7 +41,8 @@ public class BaseDbAdapter {
 
     // Aisle Table Columns
     public static final String COLUMN_AISLE_STORE_ID = "store_id";
-    public static final String COLUMN_ITEM_STORE_ID = "item_id";
+    public static final String COLUMN_AISLE_ITEM_ID = "item_id";
+    public static final String COLUMN_AISLE_AISLE_NAME = "aisle_name";
 
     //
     //private static final String TEXT_TYPE = " TEXT";
@@ -65,16 +66,17 @@ public class BaseDbAdapter {
     private static final String CREATE_TABLE_AISLE = "CREATE TABLE "
             + TABLE_AISLE+ "("
             + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_AISLE_AISLE_NAME + " text not null, "
             + COLUMN_AISLE_STORE_ID + " integer not null,"
-            + COLUMN_ITEM_STORE_ID + " integer not null,"
+            + COLUMN_AISLE_ITEM_ID + " integer not null,"
             + " FOREIGN KEY ("+COLUMN_AISLE_STORE_ID+") REFERENCES "+TABLE_STORE+"("+COLUMN_ID+")  ON DELETE CASCADE, "
-            + " FOREIGN KEY ("+COLUMN_ITEM_STORE_ID+")  REFERENCES "+TABLE_ITEM+"("+COLUMN_ID+")  ON DELETE CASCADE "
+            + " FOREIGN KEY ("+COLUMN_AISLE_ITEM_ID+")  REFERENCES "+TABLE_ITEM+"("+COLUMN_ID+")  ON DELETE CASCADE "
 
             + ")";
 
     //----------------------------------------------------------------------------------------------
     //
-    //                              SQLiteOpenHelper
+    //                              SQLiteOpenHelper::DatabaseHelper
     //
     //----------------------------------------------------------------------------------------------
     protected static class DatabaseHelper extends SQLiteOpenHelper {
@@ -82,12 +84,12 @@ public class BaseDbAdapter {
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
-            Log.d(TAG, "ctor");
+            Log.d(TAG, "DatabaseHelper::ctor");
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            Log.d(TAG, "onCreate");
+            Log.d(TAG, "DatabaseHelper::onCreate");
 
             db.execSQL(CREATE_TABLE_ITEM);
             db.execSQL(CREATE_TABLE_STORE);
@@ -99,10 +101,10 @@ public class BaseDbAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.d(TAG, "onUpgrade");
+            Log.d(TAG, "DatabaseHelper::onUpgrade");
 
             Log.w(this.getClass().getName(),
-                    "Upgrading database from version " + oldVersion + " to "
+                    "DatabaseHelper::Upgrading database from version " + oldVersion + " to "
                             + newVersion + ", which will destroy all old data");
 
             // create backup first?
@@ -116,24 +118,29 @@ public class BaseDbAdapter {
     } // DatabaseHelper
     //----------------------------------------------------------------------------------------------
     //
-    //                              SQLiteOpenHelper
+    //                              SQLiteOpenHelper::DatabaseHelper
     //
     //----------------------------------------------------------------------------------------------
 
 
     public BaseDbAdapter(Context ctx) {
+        Log.d(TAG, "BaseDbAdapter::ctor");
         this.mCtx = ctx;
     }
 
     public BaseDbAdapter open() throws SQLException {
-        Log.d(TAG, "open");
+        Log.d(TAG, "BaseDbAdapter::open");
 
-        mDatabaseHelper = new DatabaseHelper(mCtx);
-        mDb = mDatabaseHelper.getWritableDatabase();
+        if ( !isOpen()) {
+            Log.d(TAG, "BaseDbAdapter::opening");
 
-        // Enable foreign key constraints
-        if (!mDb.isReadOnly()) {
-            mDb.execSQL("PRAGMA foreign_keys = ON;");
+            mDatabaseHelper = new DatabaseHelper(mCtx);
+            mDb = mDatabaseHelper.getWritableDatabase();
+
+            // Enable foreign key constraints
+            if (!mDb.isReadOnly()) {
+                mDb.execSQL("PRAGMA foreign_keys = ON;");
+            }
         }
 
         return this;
@@ -152,8 +159,33 @@ public class BaseDbAdapter {
 
 
 
+    public boolean isOpen() {
+        Log.d(TAG, "BaseDbAdapter::isOpen=" + (mDb != null && mDb.isOpen()));
+        return mDb != null && mDb.isOpen();
+    }
+
     public void close() {
-        mDatabaseHelper.close();
+        Log.d(TAG, "BaseDbAdapter::close");
+
+
+
+        if (isOpen()) {
+            Log.d(TAG, "BaseDbAdapter::closing");
+
+            mDatabaseHelper.close();
+            mDb.close();
+            mDb = null;
+            if (mDatabaseHelper != null) {
+                mDatabaseHelper.close();
+                mDatabaseHelper = null;
+            }
+        }
+    }
+
+    public void removeAll() {
+        mDb.delete(TABLE_AISLE, null, null);
+        mDb.delete(TABLE_STORE, null, null);
+        mDb.delete(TABLE_ITEM, null, null);
     }
 
 } // BaseDbAdapter

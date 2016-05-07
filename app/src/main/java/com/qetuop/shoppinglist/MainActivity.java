@@ -1,10 +1,6 @@
 package com.qetuop.shoppinglist;
 
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,18 +10,15 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
-    protected static final String LOG = "MainActivity";
+    protected static final String TAG = "MainActivity";
 
     // Database accessors
+    private BaseDbAdapter mBaseDbAdapter;
     private ItemDbAdapter mItemDbAdapter;
 
     @Override
@@ -76,11 +69,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void databaseSetup() {
+        mBaseDbAdapter = new BaseDbAdapter(this);
+        try {
+            mBaseDbAdapter.open();
+        } catch (SQLException e) {
+            Log.e(TAG, "BaseDbAdapter open error");
+        }
+
+        // TODO: REMOVE THIS
+        mBaseDbAdapter.removeAll();
+
+        Log.v(TAG,"--------------");
+
         mItemDbAdapter = new ItemDbAdapter(this);
         try {
             mItemDbAdapter.open();
         } catch (SQLException e) {
-            Log.e(LOG, "user table open error");
+            Log.e(TAG, "item table open error");
         }
     }
 
@@ -162,12 +167,13 @@ public class MainActivity extends AppCompatActivity {
     private void update() {
         // all
         List<Item> objs = mItemDbAdapter.getAll();
-        System.out.println("---All Items---");
+
+        Log.v(TAG,"---All Items---");
         for (Item obj : objs) {
 
-            System.out.println(obj.getId() + " " + obj.getName());
+            Log.v(TAG, obj.getId() + " " + obj.getName());
         }
-        System.out.println("-----------------");
+        Log.v(TAG,"--------------");
 
         final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
 
