@@ -6,6 +6,8 @@ package com.qetuop.shoppinglist;
 public class Item {
     private long id = 0; // PK col id
     private String name = null;
+    private int selected = 0;
+    private int completed = 0;
 
     public Item() {
     }
@@ -14,9 +16,17 @@ public class Item {
         this.name = name;
     }
 
-    public Item(long id, String name) {
+    public Item(String name, int selected, int completed) {
+        this.name = name;
+        this.selected = selected;
+        this.completed = completed;
+    }
+
+    public Item(long id, String name, int selected, int completed) {
         this.id = id;
         this.name = name;
+        this.selected = selected;
+        this.completed = completed;
     }
 
     public long getId() {
@@ -35,4 +45,19 @@ public class Item {
         this.name = name;
     }
 
+    public int getSelected() {
+        return selected;
+    }
+
+    public void setSelected(int selected) {
+        this.selected = selected;
+    }
+
+    public int getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(int completed) {
+        this.completed = completed;
+    }
 } // Item

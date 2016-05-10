@@ -1,6 +1,9 @@
 package com.qetuop.shoppinglist;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     private ItemDbAdapter mItemDbAdapter;
     private StoreDbAdapter mStoreDbAdapter;
     private AisleDbAdapter mAisleDbAdapter;
+
+    // TODO: remove
+    private Long storeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         String[] tmp;
         ArrayList<String> list;
-        long storeId=0;
         ArrayList<Long> storeIds = new ArrayList<>();
 
         // Stores
@@ -129,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Create Items
         tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
-                "ice cream", "apples", "chicken", "french fries"};
+                "ice cream", "apples", "chicken", "french fries",
+        "fruit", "steak", "pop corn", "corn", "bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -160,21 +166,33 @@ public class MainActivity extends AppCompatActivity {
         final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
 
         String[] myStringArray = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"};
-        //String[] myStringArray = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
         ArrayAdapter<String> myAdapter = new
                 ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
                 myStringArray);
+
         listview.setAdapter(myAdapter);
 
-        //Cursor cursor = mItemDbAdapter.getAllCursor();
+
+        Cursor cursor = mItemDbAdapter.getAllCursor();
+
+        // THE DESIRED COLUMNS TO BE BOUND
+        String[] columns = new String[] { BaseDbAdapter.COLUMN_ITEM_NAME};
+        // THE XML DEFINED VIEWS WHICH THE DATA WILL BE BOUND TO
+        int[] to = new int[] {android.R.id.text1};
+
+        // CREATE THE ADAPTER USING THE CURSOR POINTING TO THE DESIRED DATA AS WELL AS THE LAYOUT INFORMATION
+        SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1, cursor, columns, to, 0);
+
+        listview.setAdapter(mAdapter);
 
         // Setup cursor adapter using cursor from last step
-        //WorkoutCursorAdapter workoutAdapter = new WorkoutCursorAdapter(this, workoutCursor,0);
+        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
 
         // Attach cursor adapter to the ListView
-        //listview.setAdapter(workoutAdapter.);
+        listview.setAdapter(itemAdapter);
 
 
     } // update
@@ -186,9 +204,30 @@ public class MainActivity extends AppCompatActivity {
         String s = itemEt.getText().toString();
         System.out.println("Text= " + s);
 
+        if ( itemEt.length() == 0 ) {
+            Intent intent = new Intent(this, ItemSelectionActivity.class);
+            //intent.putExtra(EXTRA_MESSAGE, 0l);
+            //startActivity(intent);
+
+            int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
+            startActivityForResult(intent, REQUEST_CODE);
+
 //        Intent intent = new Intent(this, WorkoutActivity.class);
 //        //long l = 0l;
 //        intent.putExtra(EXTRA_MESSAGE, 0l);
 //        startActivity(intent);
+        }
+        else {
+            Item item = new Item(s);
+            item.setSelected(1);
+            item.setCompleted(1);
+            mItemDbAdapter.insert(item);
+        }
+
+        update();
+
+
+
+
     }
 }

@@ -20,7 +20,7 @@ public class BaseDbAdapter {
     protected final Context mCtx;
 
     // Database Version
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 10;
 
     // Database Name
     private static final String DATABASE_NAME = "shopingList.db";
@@ -35,6 +35,8 @@ public class BaseDbAdapter {
 
     // Item Table Columns
     public static final String COLUMN_ITEM_NAME = "name";
+    public static final String COLUMN_ITEM_SELECTED = "selected";
+    public static final String COLUMN_ITEM_COMPLETED = "completed";
 
     // Store Table Columns
     public static final String COLUMN_STORE_NAME = "name";
@@ -54,7 +56,9 @@ public class BaseDbAdapter {
     private static final String CREATE_TABLE_ITEM = "CREATE TABLE "
             + TABLE_ITEM+ "("
             + COLUMN_ID + " integer primary key autoincrement, "
-            + COLUMN_ITEM_NAME + " text not null "
+            + COLUMN_ITEM_NAME + " text not null, "
+            + COLUMN_ITEM_SELECTED + " integer not null, "
+            + COLUMN_ITEM_COMPLETED + " integer not null "
             + ")";
 
     private static final String CREATE_TABLE_STORE = "CREATE TABLE "

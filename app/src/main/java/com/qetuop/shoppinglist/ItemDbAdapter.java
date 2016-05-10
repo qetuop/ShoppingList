@@ -17,7 +17,9 @@ public class ItemDbAdapter extends BaseDbAdapter
 
     private String[] projection = {
             COLUMN_ID,
-            COLUMN_ITEM_NAME
+            COLUMN_ITEM_NAME,
+            COLUMN_ITEM_SELECTED,
+            COLUMN_ITEM_COMPLETED
     };
 
     public ItemDbAdapter(Context ctx) {
@@ -31,6 +33,8 @@ public class ItemDbAdapter extends BaseDbAdapter
         ContentValues args = new ContentValues();
 
         args.put(COLUMN_ITEM_NAME, value.getName());
+        args.put(COLUMN_ITEM_SELECTED, value.getSelected());
+        args.put(COLUMN_ITEM_COMPLETED, value.getCompleted());
 
         id = mDb.insert(TABLE_ITEM, null, args);
         value.setId(id);
@@ -44,6 +48,8 @@ public class ItemDbAdapter extends BaseDbAdapter
 
         obj.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID))); // why can't get?
         obj.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ITEM_NAME)));
+        obj.setSelected(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ITEM_SELECTED)));
+        obj.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ITEM_COMPLETED)));
 
         return obj;
     }
@@ -131,9 +137,11 @@ public class ItemDbAdapter extends BaseDbAdapter
 
     // UPDATE
     public void update(long id, Item obj) {
+        ContentValues args = new ContentValues();
 
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_ITEM_NAME, obj.getName());
+        args.put(COLUMN_ITEM_NAME, obj.getName());
+        args.put(COLUMN_ITEM_SELECTED, obj.getSelected());
+        args.put(COLUMN_ITEM_COMPLETED, obj.getCompleted());
 
         // Which row to update, based on the ID
         String selection = COLUMN_ID + " LIKE ?";
@@ -141,7 +149,7 @@ public class ItemDbAdapter extends BaseDbAdapter
 
         int count = mDb.update(
                 TABLE_ITEM,
-                values,
+                args,
                 selection,
                 selectionArgs);
     }
