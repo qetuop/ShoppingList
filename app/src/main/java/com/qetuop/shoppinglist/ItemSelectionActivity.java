@@ -88,6 +88,14 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
                     }
                 });
 
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+
         alert = builder.create();
         alert.show();
     }
