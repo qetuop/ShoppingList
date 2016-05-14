@@ -1,15 +1,19 @@
 package com.qetuop.shoppinglist;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private StoreDbAdapter mStoreDbAdapter;
     private AisleDbAdapter mAisleDbAdapter;
 
+    private  ListView listview;
     // TODO: remove
     private Long storeId;
 
@@ -44,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        listview = (ListView) findViewById(R.id.content_main_lv_items);
+        listview.setOnItemClickListener(OLC);
+
+        //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
+        Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
+        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
+        listview.setAdapter(itemAdapter);
+
 
         update();
 
@@ -56,6 +71,36 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
     }
+    public void listViewClick(View view) {
+        Log.d(TAG, "CLICK");
+    }
+    private AdapterView.OnItemClickListener OLC = new  AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            ItemDbAdapter mItemDbAdapter = new ItemDbAdapter(getApplicationContext());
+            try {
+                mItemDbAdapter.open();
+            } catch (SQLException e) {
+                Log.e(TAG, "item table open error");
+            }
+
+            Log.d(TAG, "OnItemClickListener:"+String.valueOf(position) +":"+String.valueOf(id));
+            //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
+            Cursor cursor = (Cursor) listview.getAdapter().getItem(position);
+            long id2 = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
+            Item item = mItemDbAdapter.getId(id2);
+            //item.setCompleted((isChecked == true)? 1 : 0);
+            mItemDbAdapter.update(id2, item);
+        }
+    };
+
+    private View.OnClickListener ocl = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "HERE");
+        }
+    };
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,8 +187,12 @@ public class MainActivity extends AppCompatActivity {
             Item item = new Item(s);
             long id = mItemDbAdapter.insert(item);
 
-            // add to aisle
             Random randomGenerator = new Random();
+
+            item.setSelected(randomGenerator.nextInt(1));
+
+            // add to aisle
+
             for ( Long l : storeIds ) {
                 Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));
                 mAisleDbAdapter.insert(aisle);
@@ -158,42 +207,14 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v(TAG,"---All Items---");
         for (Item obj : objs) {
-
             Log.v(TAG, obj.getId() + " " + obj.getName());
         }
         Log.v(TAG,"--------------");
 
-        final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
-
-        String[] myStringArray = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"};
-        ArrayAdapter<String> myAdapter = new
-                ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                myStringArray);
-
-        listview.setAdapter(myAdapter);
-
-
-        Cursor cursor = mItemDbAdapter.getAllCursor();
-
-        // THE DESIRED COLUMNS TO BE BOUND
-        String[] columns = new String[] { BaseDbAdapter.COLUMN_ITEM_NAME};
-        // THE XML DEFINED VIEWS WHICH THE DATA WILL BE BOUND TO
-        int[] to = new int[] {android.R.id.text1};
-
-        // CREATE THE ADAPTER USING THE CURSOR POINTING TO THE DESIRED DATA AS WELL AS THE LAYOUT INFORMATION
-        SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1, cursor, columns, to, 0);
-
-        listview.setAdapter(mAdapter);
-
-        // Setup cursor adapter using cursor from last step
+        //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
+        Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
         ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
-
-        // Attach cursor adapter to the ListView
         listview.setAdapter(itemAdapter);
-
 
     } // update
 
@@ -211,23 +232,22 @@ public class MainActivity extends AppCompatActivity {
 
             int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
             startActivityForResult(intent, REQUEST_CODE);
-
-//        Intent intent = new Intent(this, WorkoutActivity.class);
-//        //long l = 0l;
-//        intent.putExtra(EXTRA_MESSAGE, 0l);
-//        startActivity(intent);
         }
         else {
             Item item = new Item(s);
             item.setSelected(1);
-            item.setCompleted(1);
             mItemDbAdapter.insert(item);
+            itemEt.setText("");
+
+            update();
         }
-
-        update();
-
-
-
-
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 0) {
+            Log.d(TAG, "onActivityResult");//
+            update();
+        }
+    } // onActivityResult
 }

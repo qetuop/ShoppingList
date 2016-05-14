@@ -2,6 +2,7 @@ package com.qetuop.shoppinglist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,10 +56,11 @@ public class ItemCursorAdapter extends CursorAdapter {
 
         if ( option == OPTION.COMPLETED.getValue() ) {
             checked = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
+            Log.d(TAG, "COMPLETED:"+checked);
         }
 
         CheckBox itemCheckedCb = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
-        itemCheckedCb.setSelected((checked == 1)? true : false);
+        itemCheckedCb.setChecked((checked == 1)? true : false);
         itemCheckedCb.setText(name);
     }
 }

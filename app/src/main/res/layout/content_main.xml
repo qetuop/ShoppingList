@@ -16,7 +16,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/relativeLayout"
-        tools:listitem="@android:layout/simple_list_item_multiple_choice" />
+        tools:listitem="@android:layout/simple_list_item_multiple_choice"
+        android:clickable="false" />
 
     <RelativeLayout
         android:orientation="horizontal"

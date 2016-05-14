@@ -135,6 +135,27 @@ public class ItemDbAdapter extends BaseDbAdapter
         return cursor;
     }
 
+    public Cursor getAllSelectedCursor() {
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = null;//COLUMN_USER_USER_NAME + " DESC";
+        String selection = COLUMN_ITEM_SELECTED + "=?";
+        String[] selectionArgs = {"1"};
+
+        Cursor cursor = mDb.query(
+                TABLE_ITEM,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+
+        cursor.moveToFirst();
+
+        return cursor;
+    }
+
     // UPDATE
     public void update(long id, Item obj) {
         ContentValues args = new ContentValues();
