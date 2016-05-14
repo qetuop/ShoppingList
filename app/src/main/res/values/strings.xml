@@ -7,4 +7,5 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="select_items">Select Items</string>
+    <string name="clear">Clear</string>
 </resources>

@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -52,7 +54,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         listview = (ListView) findViewById(R.id.content_main_lv_items);
-        listview.setOnItemClickListener(OLC);
+        //listview.setOnItemClickListener(itemClickListener);
+        //listview.setOnClickListener(itemClickListener2);
+        //listview.setItemsCanFocus(true);
+        //listview.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
 
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
         Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
@@ -62,19 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         update();
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
     }
-    public void listViewClick(View view) {
+   /* public void listViewClick(View view) {
         Log.d(TAG, "CLICK");
     }
-    private AdapterView.OnItemClickListener OLC = new  AdapterView.OnItemClickListener() {
+    private AdapterView.OnItemClickListener itemClickListener = new  AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             ItemDbAdapter mItemDbAdapter = new ItemDbAdapter(getApplicationContext());
@@ -84,15 +81,28 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "item table open error");
             }
 
-            Log.d(TAG, "OnItemClickListener:"+String.valueOf(position) +":"+String.valueOf(id));
+
             //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
             Cursor cursor = (Cursor) listview.getAdapter().getItem(position);
             long id2 = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
             Item item = mItemDbAdapter.getId(id2);
-            //item.setCompleted((isChecked == true)? 1 : 0);
+            CheckBox checkBox = (CheckBox)view;
+            item.setCompleted((checkBox.isChecked() == true)? 1 : 0);
+
+            Log.d(TAG, "OnItemClickListener:"+String.valueOf(position) +":"+String.valueOf(id) +":"+checkBox.isChecked());
+
             mItemDbAdapter.update(id2, item);
         }
     };
+
+    private AdapterView.OnClickListener itemClickListener2 = new AdapterView.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "HERE2");
+
+        }
+    };*/
 
     private View.OnClickListener ocl = new View.OnClickListener() {
         @Override
@@ -114,14 +124,44 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+
+/*        int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);*/
+
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.clear_completed:
+                // get completed list
+                ArrayList<Item> completed = (ArrayList<Item>)mItemDbAdapter.getAllCompleted();
+
+                // clear completed bool
+                for ( Item completedItem : completed ){
+                    completedItem.setCompleted(0);
+                    completedItem.setSelected(0);
+                    mItemDbAdapter.update(completedItem.getId(), completedItem);
+                }
+
+                // update
+                update();
+
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void databaseSetup() {
@@ -185,11 +225,12 @@ public class MainActivity extends AppCompatActivity {
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
             Item item = new Item(s);
-            long id = mItemDbAdapter.insert(item);
 
             Random randomGenerator = new Random();
+            item.setSelected(randomGenerator.nextInt(2));
+            //item.setCompleted(randomGenerator.nextInt(2));
 
-            item.setSelected(randomGenerator.nextInt(1));
+            long id = mItemDbAdapter.insert(item);
 
             // add to aisle
 
@@ -198,7 +239,6 @@ public class MainActivity extends AppCompatActivity {
                 mAisleDbAdapter.insert(aisle);
             }
         }
-
     } // hardcodedSetup
 
     private void update() {
@@ -212,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG,"--------------");
 
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
+
+        // TODO:  should i be setting this every update?
         Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
         ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
         listview.setAdapter(itemAdapter);

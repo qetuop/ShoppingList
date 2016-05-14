@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.qetuop.shoppinglist.MainActivity">
+
+    <item
+        android:id="@+id/clear_completed"
+        android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha"
+        android:title="@string/clear"
+        app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

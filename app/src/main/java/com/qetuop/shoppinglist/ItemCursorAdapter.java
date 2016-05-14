@@ -6,15 +6,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import java.sql.SQLException;
 
 /**
  * Created by brian on 5/10/16.
  */
 public class ItemCursorAdapter extends CursorAdapter {
     protected static final String TAG = "ItemCursorAdapter";
+
+    private Context context;
 
     public static enum OPTION {
         SELECTED(0), COMPLETED(1);
@@ -62,6 +69,34 @@ public class ItemCursorAdapter extends CursorAdapter {
         CheckBox itemCheckedCb = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
         itemCheckedCb.setChecked((checked == 1)? true : false);
         itemCheckedCb.setText(name);
+        //itemCheckedCb.setOnClickListener(itemClickListener);
+        itemCheckedCb.setOnCheckedChangeListener(ccl);
+
+        // TODO: is there a better way
+        itemCheckedCb.setTag(cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID)));
+
+        this.context = context;
+
     }
+
+    private OnCheckedChangeListener ccl = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            ItemDbAdapter mItemDbAdapter = new ItemDbAdapter(context);
+            try {
+                mItemDbAdapter.open();
+            } catch (SQLException e) {
+                Log.e(TAG, "item table open error");
+            }
+
+            long id = (long) buttonView.getTag();
+
+            Item item = mItemDbAdapter.getId(id);
+            item.setCompleted((isChecked == true)? 1 : 0);
+            mItemDbAdapter.update(id, item);
+
+        }
+    };
 }
 
