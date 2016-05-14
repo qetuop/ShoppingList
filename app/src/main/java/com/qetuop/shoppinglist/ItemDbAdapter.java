@@ -119,6 +119,35 @@ public class ItemDbAdapter extends BaseDbAdapter
         return objs;
     }
 
+    public List<Item> getAllCompleted() {
+        List<Item> objs = new ArrayList<>();
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = null;//COLUMN_USER_USER_NAME + " DESC";
+        String selection = COLUMN_ITEM_COMPLETED + "=?";
+        String[] selectionArgs = {"1"};
+
+        Cursor cursor = mDb.query(
+                TABLE_ITEM,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Item obj = cursorToObject(cursor);
+            objs.add(obj);
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+
+        return objs;
+    }
+
     public Cursor getAllCursor() {
 
         Cursor cursor = mDb.query(
