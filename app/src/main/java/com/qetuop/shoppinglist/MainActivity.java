@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 "ice cream", "apples", "chicken", "french fries",
         "fruit", "steak", "pop corn", "corn", "bread"};
 
-        tmp = new String[] { "Cereal", "Apple", "Bread"};
+        //tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -249,6 +249,9 @@ public class MainActivity extends AppCompatActivity {
                 mAisleDbAdapter.insert(aisle);
             }
         }
+
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        Log.d(TAG, "Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
     } // hardcodedSetup
 
     private void update() {

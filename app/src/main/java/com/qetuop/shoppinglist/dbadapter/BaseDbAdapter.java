@@ -1,6 +1,7 @@
 package com.qetuop.shoppinglist.dbadapter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -190,6 +191,21 @@ public class BaseDbAdapter {
         mDb.delete(TABLE_AISLE, null, null);
         mDb.delete(TABLE_STORE, null, null);
         mDb.delete(TABLE_ITEM, null, null);
+    }
+
+    public Cursor getItemAisleCursor(long storeId) {
+
+        final String MY_QUERY =
+                "SELECT item.name, item.selected, aisle.aisle_name " +
+                "FROM item, aisle " +
+                "WHERE item.selected=1 " +
+                "    AND (aisle.store_id=? AND aisle.item_id=item._id)";
+        String[] args =  new String[]{String.valueOf(storeId)};
+        Cursor cursor = mDb.rawQuery(MY_QUERY, args, null);
+
+        cursor.moveToFirst();
+
+        return cursor;
     }
 
 } // BaseDbAdapter
