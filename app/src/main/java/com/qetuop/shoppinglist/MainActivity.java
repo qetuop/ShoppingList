@@ -61,8 +61,10 @@ public class MainActivity extends AppCompatActivity {
         //listview.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
 
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
-        Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
-        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
+        //Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        Log.d(TAG, "***Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
+        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, 0);
         listview.setAdapter(itemAdapter);
 
 
@@ -267,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
 
         // TODO:  should i be setting this every update?
-        Cursor cursor = mItemDbAdapter.getAllSelectedCursor();
-        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.COMPLETED.getValue());
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, 0);
         listview.setAdapter(itemAdapter);
 
     } // update

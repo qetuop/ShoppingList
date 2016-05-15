@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
+import android.widget.TextView;
 
 import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
@@ -25,7 +26,7 @@ public class ItemCursorAdapter extends CursorAdapter {
 
     private Context context;
 
-    public static enum OPTION {
+   /* public static enum OPTION {
         SELECTED(0), COMPLETED(1);
 
         private final int value;
@@ -37,14 +38,14 @@ public class ItemCursorAdapter extends CursorAdapter {
         public int getValue() {
             return value;
         }
-    }
+    }*/
 
-    int option = 0;
+    //int option = 0;
 
     public ItemCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
 
-        option = flags;
+        //option = flags;
     }
 
     // The newView method is used to inflate a new view and return it,
@@ -60,19 +61,21 @@ public class ItemCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
 
         // Extract properties from cursor
-        String name = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_NAME));
-        int checked = 0;
+        int     checked     = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
+        String  aisleName   = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_AISLE_NAME));
+        String  itemName    = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_NAME));
 
-        if ( option == OPTION.COMPLETED.getValue() ) {
-            checked = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
-            Log.d(TAG, "COMPLETED:"+checked);
-        }
+        CheckBox itemCheckedCb  = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
+        TextView aisleNameTv    = (TextView) view.findViewById(R.id.row_aisle_name_tv);
+        TextView itemNameTv     = (TextView) view.findViewById(R.id.row_item_name_tv);
 
-        CheckBox itemCheckedCb = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
         itemCheckedCb.setChecked((checked == 1)? true : false);
-        itemCheckedCb.setText(name);
+        //itemCheckedCb.setText(name);
         //itemCheckedCb.setOnClickListener(itemClickListener);
         itemCheckedCb.setOnCheckedChangeListener(ccl);
+
+        aisleNameTv.setText(aisleName);
+        itemNameTv.setText(itemName);
 
         // TODO: is there a better way
         itemCheckedCb.setTag(cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID)));

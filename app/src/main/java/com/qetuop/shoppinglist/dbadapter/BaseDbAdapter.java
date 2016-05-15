@@ -196,7 +196,7 @@ public class BaseDbAdapter {
     public Cursor getItemAisleCursor(long storeId) {
 
         final String MY_QUERY =
-                "SELECT item.name, item.selected, aisle.aisle_name " +
+                "SELECT item._id, item.name, item.selected, item.completed, aisle.aisle_name " +
                 "FROM item, aisle " +
                 "WHERE item.selected=1 " +
                 "    AND (aisle.store_id=? AND aisle.item_id=item._id)";
