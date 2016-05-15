@@ -3,17 +3,16 @@ package com.qetuop.shoppinglist;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
+
+import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
+import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
+import com.qetuop.shoppinglist.pojo.Item;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemSelectionActivity extends AppCompatActivity implements AlertDialog.OnMultiChoiceClickListener {
     protected static final String TAG = "ItemSelectionActivity";

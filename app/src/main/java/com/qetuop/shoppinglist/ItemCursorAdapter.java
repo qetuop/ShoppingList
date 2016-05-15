@@ -6,12 +6,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
-import android.widget.TextView;
+
+import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
+import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
+import com.qetuop.shoppinglist.pojo.Item;
 
 import java.sql.SQLException;
 

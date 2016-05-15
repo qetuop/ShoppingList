@@ -1,24 +1,25 @@
 package com.qetuop.shoppinglist;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.qetuop.shoppinglist.dbadapter.AisleDbAdapter;
+import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
+import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
+import com.qetuop.shoppinglist.dbadapter.StoreDbAdapter;
+import com.qetuop.shoppinglist.pojo.Aisle;
+import com.qetuop.shoppinglist.pojo.Item;
+import com.qetuop.shoppinglist.pojo.Store;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -221,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
         tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
                 "ice cream", "apples", "chicken", "french fries",
         "fruit", "steak", "pop corn", "corn", "bread"};
+
+        tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -235,7 +238,14 @@ public class MainActivity extends AppCompatActivity {
             // add to aisle
 
             for ( Long l : storeIds ) {
-                Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));
+                String aisle_name = "";
+                int rand = randomGenerator.nextInt(3);
+                Log.d(TAG, "RAND:"+ String.valueOf(rand));
+                if ( rand >= 1 ) {
+                    aisle_name = String.valueOf(rand);
+                }
+                //Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));
+                Aisle aisle = new Aisle(l, item.getId(), aisle_name);
                 mAisleDbAdapter.insert(aisle);
             }
         }

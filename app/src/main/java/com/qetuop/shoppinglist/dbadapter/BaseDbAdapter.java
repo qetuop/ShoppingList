@@ -1,4 +1,4 @@
-package com.qetuop.shoppinglist;
+package com.qetuop.shoppinglist.dbadapter;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,7 +17,7 @@ public class BaseDbAdapter {
     //public DatabaseHelper mDatabaseHelper; // not thread safe?
     protected static DatabaseHelper mDatabaseHelper; // more thread safe?
     protected static SQLiteDatabase mDb; // TODO: should this be static?
-    protected final Context mCtx;
+    protected Context mCtx;
 
     // Database Version
     private static final int DATABASE_VERSION = 10;

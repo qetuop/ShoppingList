@@ -1,9 +1,11 @@
-package com.qetuop.shoppinglist;
+package com.qetuop.shoppinglist.dbadapter;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+
+import com.qetuop.shoppinglist.pojo.Item;
 
 import java.util.ArrayList;
 import java.util.List;

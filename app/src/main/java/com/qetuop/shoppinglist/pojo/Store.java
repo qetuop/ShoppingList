@@ -1,4 +1,4 @@
-package com.qetuop.shoppinglist;
+package com.qetuop.shoppinglist.pojo;
 
 /**
  * Created by brian on 4/25/16.
