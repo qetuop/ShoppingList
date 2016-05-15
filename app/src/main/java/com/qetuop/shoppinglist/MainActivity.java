@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.qetuop.shoppinglist.dbadapter.AisleDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
@@ -66,11 +68,22 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "***Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
         ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, 0);
         listview.setAdapter(itemAdapter);
+        //listview.setOnLongClickListener(longClickListener);
 
 
         update();
 
     }
+
+   /* private AdapterViewCompat.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+
+        @Override
+        public boolean onLongClick(View v) {
+            Toast.makeText(getApplicationContext(), "Long Clicked", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+    };*/
+
    /* public void listViewClick(View view) {
         Log.d(TAG, "CLICK");
     }
@@ -241,9 +254,15 @@ public class MainActivity extends AppCompatActivity {
 
             for ( Long l : storeIds ) {
                 String aisle_name = "";
-                int rand = randomGenerator.nextInt(3);
+                int rand = randomGenerator.nextInt(8);
                 Log.d(TAG, "RAND:"+ String.valueOf(rand));
-                if ( rand >= 1 ) {
+                if (rand == 0 ) {
+                    aisle_name = "";
+                }
+                else if ( rand == 1 ) {
+                    aisle_name = "Deli";
+                }
+                else  {
                     aisle_name = String.valueOf(rand);
                 }
                 //Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));

@@ -72,8 +72,8 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
-                        setResult(RESULT_OK, intent);
+                        //Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                        //setResult(RESULT_OK, intent);
                         finish();
                     }
                 });
@@ -81,8 +81,8 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
-                        setResult(RESULT_OK, intent);
+                        //Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                        //setResult(RESULT_CANCELED, intent);
                         finish();
                     }
                 });

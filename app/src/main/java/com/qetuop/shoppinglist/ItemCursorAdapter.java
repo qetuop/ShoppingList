@@ -1,7 +1,10 @@
 package com.qetuop.shoppinglist;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.support.v7.internal.widget.AdapterViewCompat;
+import android.support.v7.internal.widget.AdapterViewCompat.OnItemLongClickListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
@@ -70,9 +74,9 @@ public class ItemCursorAdapter extends CursorAdapter {
         TextView itemNameTv     = (TextView) view.findViewById(R.id.row_item_name_tv);
 
         itemCheckedCb.setChecked((checked == 1)? true : false);
-        //itemCheckedCb.setText(name);
-        //itemCheckedCb.setOnClickListener(itemClickListener);
-        itemCheckedCb.setOnCheckedChangeListener(ccl);
+        itemCheckedCb.setOnCheckedChangeListener(checkedChangeListener);
+        itemNameTv.setOnLongClickListener(longClickListener);
+
 
         aisleNameTv.setText(aisleName);
         itemNameTv.setText(itemName);
@@ -84,7 +88,27 @@ public class ItemCursorAdapter extends CursorAdapter {
 
     }
 
-    private OnCheckedChangeListener ccl = new OnCheckedChangeListener() {
+    private AdapterViewCompat.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+
+        @Override
+        public boolean onLongClick(View v) {
+            // TODO Auto-generated method stub
+            Toast.makeText(context, "Long Clicked", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(context, ItemEditActivity.class);
+            //intent.putExtra(EXTRA_MESSAGE, 0l);
+            //startActivity(intent);
+
+            int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
+            //context.startActivityForResult(intent, REQUEST_CODE);
+            context.startActivity(intent);
+
+
+            return true;
+        }
+    };
+
+    private OnCheckedChangeListener checkedChangeListener = new OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 

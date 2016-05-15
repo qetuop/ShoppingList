@@ -199,7 +199,8 @@ public class BaseDbAdapter {
                 "SELECT item._id, item.name, item.selected, item.completed, aisle.aisle_name " +
                 "FROM item, aisle " +
                 "WHERE item.selected=1 " +
-                "    AND (aisle.store_id=? AND aisle.item_id=item._id)";
+                "    AND (aisle.store_id=? AND aisle.item_id=item._id)"+
+                "ORDER BY aisle_name";
         String[] args =  new String[]{String.valueOf(storeId)};
         Cursor cursor = mDb.rawQuery(MY_QUERY, args, null);
 
