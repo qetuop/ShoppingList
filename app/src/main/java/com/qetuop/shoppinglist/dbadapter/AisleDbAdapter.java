@@ -93,6 +93,13 @@ public class AisleDbAdapter extends BaseDbAdapter
         return get(selection, selectionArgs);
     }
 
+    public Aisle getItem(long itemId) {
+        String selection = COLUMN_AISLE_ITEM_ID + "=?";
+        String[] selectionArgs = {String.valueOf(itemId)};
+
+        return get(selection, selectionArgs);
+    }
+
     public List<Aisle> getAll() {
         List<Aisle> objs = new ArrayList<>();
 

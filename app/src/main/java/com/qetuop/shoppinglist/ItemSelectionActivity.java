@@ -19,36 +19,6 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
 
     private AlertDialog alert;
 
-   /* @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_selection);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Items");
-
-        builder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface arg0, int arg1) {
-                //Toast.makeText(ItemSelectionActivity.this,"You clicked yes button",Toast.LENGTH_LONG).show();
-                finish();
-            }
-        });
-
-        ItemDbAdapter mItemDbAdapter = new ItemDbAdapter(this);
-        try {
-            mItemDbAdapter.open();
-        } catch (SQLException e) {
-            Log.e(TAG, "item table open error");
-        }
-
-        Cursor cursor = mItemDbAdapter.getAllCursor();
-        ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, ItemCursorAdapter.OPTION.SELECTED.getValue());
-        builder.setAdapter(itemAdapter, this);
-        AlertDialog alert = builder.create();
-        alert.show();
-    }*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +42,8 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        //Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
-                        //setResult(RESULT_OK, intent);
+                        Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                        setResult(RESULT_OK, intent);
                         finish();
                     }
                 });
@@ -81,8 +51,8 @@ public class ItemSelectionActivity extends AppCompatActivity implements AlertDia
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        //Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
-                        //setResult(RESULT_CANCELED, intent);
+                        Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                        setResult(RESULT_CANCELED, intent);
                         finish();
                     }
                 });

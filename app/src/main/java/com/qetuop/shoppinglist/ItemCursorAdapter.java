@@ -28,7 +28,11 @@ import java.sql.SQLException;
 public class ItemCursorAdapter extends CursorAdapter {
     protected static final String TAG = "ItemCursorAdapter";
 
+    public final static String EXTRA_MESSAGE = "com.qetuop.MESSAGE";
+
     private Context context;
+
+    private long itemId = 0;
 
    /* public static enum OPTION {
         SELECTED(0), COMPLETED(1);
@@ -48,6 +52,7 @@ public class ItemCursorAdapter extends CursorAdapter {
 
     public ItemCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
+        this.context = context;
 
         //option = flags;
     }
@@ -63,8 +68,9 @@ public class ItemCursorAdapter extends CursorAdapter {
     // such as setting the text on a TextView.
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-
+if ( cursor != null ) Log.d(TAG, "bindView, cursor size: " + String.valueOf(cursor.getCount()));
         // Extract properties from cursor
+        itemId = cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
         int     checked     = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
         String  aisleName   = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_AISLE_NAME));
         String  itemName    = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_NAME));
@@ -82,10 +88,7 @@ public class ItemCursorAdapter extends CursorAdapter {
         itemNameTv.setText(itemName);
 
         // TODO: is there a better way
-        itemCheckedCb.setTag(cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID)));
-
-        this.context = context;
-
+        //itemCheckedCb.setTag(cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID)));
     }
 
     private AdapterViewCompat.OnLongClickListener longClickListener = new View.OnLongClickListener() {
@@ -96,7 +99,7 @@ public class ItemCursorAdapter extends CursorAdapter {
             Toast.makeText(context, "Long Clicked", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(context, ItemEditActivity.class);
-            //intent.putExtra(EXTRA_MESSAGE, 0l);
+            intent.putExtra(EXTRA_MESSAGE, itemId);
             //startActivity(intent);
 
             int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
@@ -119,11 +122,11 @@ public class ItemCursorAdapter extends CursorAdapter {
                 Log.e(TAG, "item table open error");
             }
 
-            long id = (long) buttonView.getTag();
+            //long id = (long) buttonView.getTag();
 
-            Item item = mItemDbAdapter.getId(id);
+            Item item = mItemDbAdapter.getId(itemId);
             item.setCompleted((isChecked == true)? 1 : 0);
-            mItemDbAdapter.update(id, item);
+            mItemDbAdapter.update(itemId, item);
 
         }
     };
