@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private AisleDbAdapter mAisleDbAdapter;
 
     private  ListView listview;
-    private ItemCursorAdapter itemCursorAdapter;
+    //private ItemCursorAdapter itemCursorAdapter;
 
     // TODO: remove
     private Long storeId;
@@ -60,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         listview = (ListView) findViewById(R.id.content_main_lv_items);
 
-        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
-        Log.d(TAG, "***Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
-        itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
-        listview.setAdapter(itemCursorAdapter);
+        //Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        //Log.d(TAG, "***Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
+        //itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
+        //listview.setAdapter(itemCursorAdapter);
 
 
         update();
@@ -74,21 +74,21 @@ public class MainActivity extends AppCompatActivity {
         // all
         List<Item> objs = mItemDbAdapter.getAll();
 
-        Log.v(TAG,"---All Items---");
+        Log.v(TAG,"---All Items---(storeId):" + storeId);
         for (Item obj : objs) {
             Log.v(TAG, obj.getId() + " " + obj.getName() + " " + obj.getSelected());
         }
         Log.v(TAG,"--------------");
-        if ( itemCursorAdapter != null ) Log.d(TAG, "update, itemCursorAdapter size: " + itemCursorAdapter.getCount());
+        //if ( itemCursorAdapter != null ) Log.d(TAG, "update, itemCursorAdapter size[1]: " + itemCursorAdapter.getCount());
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
         //itemCursorAdapter.notifyDataSetChanged();
         //listview.invalidateViews();
 
 
         // TODO:  should i be setting this every update?
-        //Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
-        //ItemCursorAdapter itemAdapter = new ItemCursorAdapter(this, cursor, 0);
-        //listview.setAdapter(itemAdapter);
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        ItemCursorAdapter itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
+        listview.setAdapter(itemCursorAdapter);
         //listview.refreshDrawableState();
 
     } // update
@@ -187,11 +187,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create Items
-        tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
+/*        tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
                 "ice cream", "apples", "chicken", "french fries",
-        "fruit", "steak", "pop corn", "corn", "bread"};
+        "fruit", "steak", "pop corn", "corn", "bread"};*/
 
-        //tmp = new String[] { "Cereal", "Apple", "Bread"};
+        tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -247,9 +247,19 @@ public class MainActivity extends AppCompatActivity {
         else {
             Item item = new Item(s);
             item.setSelected(1);
-            mItemDbAdapter.insert(item);
+            long itemId = mItemDbAdapter.insert(item);
+
+            // need to add aisle for every store.
+            List<Store> stores = mStoreDbAdapter.getAll();
+            for ( Store store : stores ) {
+                Aisle aisle = new Aisle();
+                aisle.setItemId(itemId);
+                aisle.setStoreId(store.getId());
+                mAisleDbAdapter.insert(aisle);
+            }
+
             itemEt.setText("");
-            Log.d(TAG, "Item added bout to update");
+            Log.d(TAG, "Item added bout to update: " + itemId + ":" + item.getId() + ":" + item.getName());
             update();
         }
     }
