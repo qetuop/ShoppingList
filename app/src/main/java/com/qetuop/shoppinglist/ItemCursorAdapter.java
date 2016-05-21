@@ -1,5 +1,6 @@
 package com.qetuop.shoppinglist;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -72,7 +73,12 @@ public class ItemCursorAdapter extends CursorAdapter {
         public void onClick(View v) {
             Intent intent = new Intent(context, ItemEditActivity.class);
             intent.putExtra(EXTRA_MESSAGE, itemId);
-            context.startActivity(intent);
+            //context.startActivity(intent);
+
+            int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
+            // TODO: is this really right?
+            ((Activity)context).startActivityForResult(intent,REQUEST_CODE);
+
         }
     };
 

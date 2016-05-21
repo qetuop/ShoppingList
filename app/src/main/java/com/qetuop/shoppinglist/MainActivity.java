@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void update() {
+    public void update() {
         // all
         List<Item> objs = mItemDbAdapter.getAll();
 
