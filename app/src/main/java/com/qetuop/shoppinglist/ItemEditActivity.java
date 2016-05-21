@@ -1,5 +1,6 @@
 package com.qetuop.shoppinglist;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,6 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.qetuop.shoppinglist.dbadapter.AisleDbAdapter;
@@ -57,13 +62,32 @@ public class ItemEditActivity extends AppCompatActivity {
         builder.setTitle(R.string.edit_items);
 
 
-        LayoutInflater inflater = LayoutInflater.from(builder.getContext());
+
+        //LayoutInflater inflater = LayoutInflater.from(builder.getContext());
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.content_item_edit, null);
+        builder.setView(dialogView);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
-        builder.setView(inflater.inflate(R.layout.content_item_edit, null));
+        //builder.setView(inflater.inflate(R.layout.content_item_edit, null));
+
+        EditText itemNameEt = (EditText) dialogView.findViewById(R.id.item_edit_name_et);
+        EditText aisleNameEt = (EditText) dialogView.findViewById(R.id.item_edit_aisle_et);
+
+        Log.d(TAG, "Item:"+ (item==null));
+        Log.d(TAG, "itemNameEt:"+ (itemNameEt==null));
+
+        itemNameEt.setText(item.getName());;
+        aisleNameEt.setText(aisle.getName());
+
+        //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.showSoftInput(itemNameEt, InputMethodManager.SHOW_IMPLICIT);
+        //itemNameEt.requestFocus();
 
 
+        //setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_S‌​TATE_VISIBLE);
 
 
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -94,16 +118,9 @@ public class ItemEditActivity extends AppCompatActivity {
         });
 
         alert = builder.create();
-
-
-
         alert.show();
 
-        TextView itemNameTv = (TextView) findViewById(R.id.item_edit_name_tv);
-        TextView aisleNameTv = (TextView) findViewById(R.id.item_edit_aisle_tv);
 
-        //itemNameTv.setText(item.getName());;
-        //aisleNameTv.setText(aisle.getName());
     }
 
     @Override

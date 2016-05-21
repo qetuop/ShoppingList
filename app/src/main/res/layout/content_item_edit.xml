@@ -3,17 +3,18 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/item_edit_name_tv"
+        android:id="@+id/item_edit_name_et"
         android:hint="Name" />
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/item_edit_aisle_tv"
+        android:id="@+id/item_edit_aisle_et"
         android:hint="aisle" />
+
 </LinearLayout>
