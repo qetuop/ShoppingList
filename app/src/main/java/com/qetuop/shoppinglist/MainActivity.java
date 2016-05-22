@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -65,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
         //itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
         //listview.setAdapter(itemCursorAdapter);
 
+        /*AutoCompleteTextView actv;
+        actv = (AutoCompleteTextView) findViewById(R.id.content_main_et_add);
+        ArrayList<String> itemNames = (ArrayList<String>) mItemDbAdapter.getAllNames();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,itemNames);
+        actv.setAdapter(adapter);*/
 
         update();
 
@@ -90,6 +97,12 @@ public class MainActivity extends AppCompatActivity {
         ItemCursorAdapter itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
         listview.setAdapter(itemCursorAdapter);
         //listview.refreshDrawableState();
+
+        AutoCompleteTextView actv;
+        actv = (AutoCompleteTextView) findViewById(R.id.content_main_et_add);
+        ArrayList<String> itemNames = (ArrayList<String>) mItemDbAdapter.getAllNames();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,itemNames);
+        actv.setAdapter(adapter);
 
     } // update
 
@@ -233,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
     // if text entry is blank, bring up selection list
     public void addItem(View view) {
-        EditText itemEt = (EditText) findViewById(R.id.content_main_et_message);
+        EditText itemEt = (EditText) findViewById(R.id.content_main_et_add);
         String s = itemEt.getText().toString();
         System.out.println("Text= " + s);
 

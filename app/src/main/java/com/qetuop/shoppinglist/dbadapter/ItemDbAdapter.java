@@ -120,6 +120,34 @@ public class ItemDbAdapter extends BaseDbAdapter
 
         return objs;
     }
+    public List<String> getAllNames() {
+        List<String> objs = new ArrayList<>();
+
+        String[] projection = {
+                COLUMN_ITEM_NAME
+        };
+        Cursor cursor = mDb.query(
+                true,
+                TABLE_ITEM,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            objs.add( cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ITEM_NAME)) );
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+
+        return objs;
+    }
+
 
     public List<Item> getAllCompleted() {
         List<Item> objs = new ArrayList<>();
