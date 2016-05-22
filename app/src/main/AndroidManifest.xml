@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ItemSelectionActivity" />
-        <activity android:name=".ItemEditActivity"></activity>
+        <activity android:name=".ItemEditActivity" />
+        <activity android:name=".StoreSelectionActivity"></activity>
     </application>
 
 </manifest>

@@ -1,10 +1,10 @@
 package com.qetuop.shoppinglist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.qetuop.shoppinglist.dbadapter.AisleDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
@@ -34,6 +33,11 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
     protected static final String TAG = "MainActivity";
 
+    public static final String PREFS_NAME = "preferences";
+
+    public static final int STORE_SELECTION = 1;
+
+
     // Database accessors
     private BaseDbAdapter mBaseDbAdapter;
     private ItemDbAdapter mItemDbAdapter;
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     //private ItemCursorAdapter itemCursorAdapter;
 
     // TODO: remove
-    private Long storeId;
+    private Long mStoreId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +56,15 @@ public class MainActivity extends AppCompatActivity {
 
         databaseSetup();
 
+        // Restore preferences
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        //boolean silent = settings.getBoolean("silentMode", false);
+        //setSilent(silent);
+        mStoreId = settings.getLong("storeId", 0l);
+
         // TODO: remove
         hardcodedSetup();
+
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -62,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
         listview = (ListView) findViewById(R.id.content_main_lv_items);
 
-        //Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
-        //Log.d(TAG, "***Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));
+        //Cursor cursor = mBaseDbAdapter.getItemAisleCursor(mStoreId);
+        //Log.d(TAG, "***Cursor for store: " + String.valueOf(mStoreId) + ":"+String.valueOf(cursor.getCount()));
         //itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
         //listview.setAdapter(itemCursorAdapter);
 
@@ -77,11 +88,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("storeId", mStoreId);
+
+        // Commit the edits!
+        editor.commit();
+    }
+
+
     public void update() {
         // all
         List<Item> objs = mItemDbAdapter.getAll();
 
-        Log.v(TAG,"---All Items---(storeId):" + storeId);
+        Log.v(TAG,"---All Items---(mStoreId):" + mStoreId + ":" +mStoreDbAdapter.getId(mStoreId).getName());
         for (Item obj : objs) {
             Log.v(TAG, obj.getId() + " " + obj.getName() + " " + obj.getSelected());
         }
@@ -93,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // TODO:  should i be setting this every update?
-        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(mStoreId);
         ItemCursorAdapter itemCursorAdapter = new ItemCursorAdapter(this, cursor, 0);
         listview.setAdapter(itemCursorAdapter);
         //listview.refreshDrawableState();
@@ -137,6 +163,19 @@ public class MainActivity extends AppCompatActivity {
 
                 // update
                 update();
+
+                return true;
+
+            case R.id.menu_select_store:
+                Log.d(TAG, "SELECT STORE");
+
+                Intent intent = new Intent(this, StoreSelectionActivity.class);
+                //intent.putExtra(EXTRA_MESSAGE, 0l);
+                //startActivity(intent);
+
+                int REQUEST_CODE = STORE_SELECTION; // set it to ??? a code to identify which activity is returning?
+                startActivityForResult(intent, REQUEST_CODE);
+
 
                 return true;
 
@@ -196,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         for ( String s : list ) {
             Store store = new Store(s);
             long id = mStoreDbAdapter.insert(store);
-            storeId = id;
+            mStoreId = id;
             storeIds.add(id);
         }
 
@@ -205,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                 "ice cream", "apples", "chicken", "french fries",
         "fruit", "steak", "pop corn", "corn", "bread"};
 
-        //tmp = new String[] { "Cereal", "Apple", "Bread"};
+        tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -219,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
             // add to aisle
 
-            for ( Long l : storeIds ) {
+            for ( Long tmpStoreId : storeIds ) {
                 String aisle_name = "";
                 int rand = randomGenerator.nextInt(8);
                 //Log.d(TAG, "RAND:"+ String.valueOf(rand));
@@ -233,13 +272,13 @@ public class MainActivity extends AppCompatActivity {
                     aisle_name = String.valueOf(rand);
                 }
                 //Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));
-                Aisle aisle = new Aisle(l, item.getId(), aisle_name);
+                Aisle aisle = new Aisle(tmpStoreId, item.getId(), aisle_name);
                 mAisleDbAdapter.insert(aisle);
             }
         }
 /*
-        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(storeId);
-        Log.d(TAG, "Cursor for store: " + String.valueOf(storeId) + ":"+String.valueOf(cursor.getCount()));*/
+        Cursor cursor = mBaseDbAdapter.getItemAisleCursor(mStoreId);
+        Log.d(TAG, "Cursor for store: " + String.valueOf(mStoreId) + ":"+String.valueOf(cursor.getCount()));*/
     } // hardcodedSetup
 
 
@@ -307,5 +346,15 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onActivityResult");//
             update();
         }
+
+        if (resultCode == RESULT_OK && requestCode == STORE_SELECTION) {
+            Log.d(TAG, "update store");//
+
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+            mStoreId = settings.getLong("storeId", 0l);
+
+            update();
+        }
+
     } // onActivityResult
 }

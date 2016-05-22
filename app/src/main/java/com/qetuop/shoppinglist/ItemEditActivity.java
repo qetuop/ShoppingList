@@ -3,6 +3,7 @@ package com.qetuop.shoppinglist;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -53,8 +54,11 @@ public class ItemEditActivity extends AppCompatActivity {
             Log.e(TAG, "aisle table open error");
         }
 
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        long storeId = settings.getLong("storeId", 0l);
+
         final Item item = mItemDbAdapter.getId(itemId);
-        final Aisle aisle = mAisleDbAdapter.getItem(itemId);
+        final Aisle aisle = mAisleDbAdapter.getItemFromStore(itemId, storeId);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.edit_items);

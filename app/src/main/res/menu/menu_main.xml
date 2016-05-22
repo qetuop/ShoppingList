@@ -7,11 +7,20 @@
         android:id="@+id/clear_completed"
         android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha"
         android:title="@string/clear"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/menu_select_store"
+                android:title="@string/select_store" />
+            <item
+                android:id="@+id/create_new2"
+                android:title="foo" />
+        </menu>
+    </item>
 </menu>

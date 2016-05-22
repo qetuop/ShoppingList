@@ -100,6 +100,14 @@ public class AisleDbAdapter extends BaseDbAdapter
         return get(selection, selectionArgs);
     }
 
+    public Aisle getItemFromStore(long itemId, long storeId) {
+    String selection =  COLUMN_AISLE_ITEM_ID + "=? AND " +
+                        COLUMN_AISLE_STORE_ID + "=?";
+    String[] selectionArgs = {String.valueOf(itemId), String.valueOf(storeId)};
+
+    return get(selection, selectionArgs);
+}
+
     public List<Aisle> getAll() {
         List<Aisle> objs = new ArrayList<>();
 
