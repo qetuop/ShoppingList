@@ -32,7 +32,7 @@ public class ItemCursorAdapter extends CursorAdapter {
     public final static String EXTRA_MESSAGE = "com.qetuop.MESSAGE";
 
     private Context context;
-    private long itemId = 0;
+    //private long itemId = 0;
 
     public ItemCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
@@ -51,11 +51,11 @@ public class ItemCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        itemId = cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
+        long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
         int     checked     = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
         String  aisleName   = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_AISLE_NAME));
         String  itemName    = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_NAME));
-
+Log.d(TAG, "bindView: " + itemId);
         CheckBox itemCheckedCb  = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
         TextView aisleNameTv    = (TextView) view.findViewById(R.id.row_aisle_name_tv);
         TextView itemNameTv     = (TextView) view.findViewById(R.id.row_item_name_tv);
@@ -63,20 +63,22 @@ public class ItemCursorAdapter extends CursorAdapter {
         itemCheckedCb.setChecked((checked == 1)? true : false);
         itemCheckedCb.setOnCheckedChangeListener(checkedChangeListener);
         itemNameTv.setOnClickListener(clickListener);
+        itemCheckedCb.setTag(itemId);
 
         aisleNameTv.setText(aisleName);
         itemNameTv.setText(itemName);
+        itemNameTv.setTag(itemId);
     }
 
     private AdapterViewCompat.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            long itemId = (long)v.findViewById(R.id.row_item_name_tv).getTag();
+
             Intent intent = new Intent(context, ItemEditActivity.class);
             intent.putExtra(EXTRA_MESSAGE, itemId);
-            //context.startActivity(intent);
 
             int REQUEST_CODE = 0; // set it to ??? a code to identify which activity is returning?
-            // TODO: is this really right?
             ((Activity)context).startActivityForResult(intent,REQUEST_CODE);
 
         }
@@ -86,13 +88,14 @@ public class ItemCursorAdapter extends CursorAdapter {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+            long itemId = (long)buttonView.getTag();
             ItemDbAdapter mItemDbAdapter = new ItemDbAdapter(context);
             try {
                 mItemDbAdapter.open();
             } catch (SQLException e) {
                 Log.e(TAG, "item table open error");
             }
-
+Log.d(TAG, "Checked item: " + itemId);
             Item item = mItemDbAdapter.getId(itemId);
             item.setCompleted((isChecked == true)? 1 : 0);
             mItemDbAdapter.update(itemId, item);

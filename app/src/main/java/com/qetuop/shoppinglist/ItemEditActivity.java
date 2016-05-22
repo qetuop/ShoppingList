@@ -72,8 +72,10 @@ public class ItemEditActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
+
                 aisle.setName(aisleNameEt.getText().toString());
                 item.setName(itemNameEt.getText().toString());
+
                 mItemDbAdapter.update(item.getId(), item);
                 mAisleDbAdapter.update(aisle.getId(), aisle);
 

@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Stores
         tmp = new String[] { "Giant", "Safeway"};
+        //tmp = new String[] { "Giant"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -187,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create Items
-/*        tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
+        tmp = new String[] { "Milk", "Butter", "Cheese", "cereal",
                 "ice cream", "apples", "chicken", "french fries",
-        "fruit", "steak", "pop corn", "corn", "bread"};*/
+        "fruit", "steak", "pop corn", "corn", "bread"};
 
         tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
