@@ -3,6 +3,7 @@ package com.qetuop.shoppinglist.dbadapter;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.qetuop.shoppinglist.pojo.Item;
@@ -97,6 +98,39 @@ public class ItemDbAdapter extends BaseDbAdapter
         return get(selection, selectionArgs);
     }
 
+    //select * from users where lower(first_name) like '%al%';
+
+/*    Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+            new String[] {Contacts._ID}, ContactsContract.CommonDataKinds.Email.ADDRESS + "=? COLLATE NOCASE",
+            new String[] {email}, null);*/
+
+
+    public Item getNameNoCase(String name) {
+        Item obj = new Item();
+
+        String selection = COLUMN_ITEM_NAME + "=? COLLATE NOCASE";
+        String[] selectionArgs = {name};
+
+        Cursor cursor = mDb.query(
+                TABLE_ITEM,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        cursor.moveToFirst();
+        if ( cursor.moveToFirst() == true ) {// not empty
+            obj = cursorToObject(cursor);
+        }
+
+        cursor.close();
+
+        return obj;
+    }
+
     public List<Item> getAll() {
         List<Item> objs = new ArrayList<>();
 
@@ -180,6 +214,8 @@ public class ItemDbAdapter extends BaseDbAdapter
 
     public Cursor getAllCursor() {
 
+        String sortOrder = COLUMN_ITEM_NAME + " COLLATE NOCASE";
+
         Cursor cursor = mDb.query(
                 TABLE_ITEM,
                 projection,
@@ -187,7 +223,7 @@ public class ItemDbAdapter extends BaseDbAdapter
                 null,
                 null,
                 null,
-                null);
+                sortOrder);
 
         cursor.moveToFirst();
 

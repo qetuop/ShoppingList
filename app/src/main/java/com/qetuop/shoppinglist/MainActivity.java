@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 "ice cream", "apples", "chicken", "french fries",
         "fruit", "steak", "pop corn", "corn", "bread"};
 
-        tmp = new String[] { "Cereal", "Apple", "Bread"};
+        //tmp = new String[] { "Cereal", "Apple", "Bread"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -247,8 +247,8 @@ public class MainActivity extends AppCompatActivity {
     // if text entry is blank, bring up selection list
     public void addItem(View view) {
         EditText itemEt = (EditText) findViewById(R.id.content_main_et_add);
-        String s = itemEt.getText().toString();
-        System.out.println("Text= " + s);
+        String itemName = itemEt.getText().toString();
+        System.out.println("Text= " + itemName);
 
         if ( itemEt.length() == 0 ) {
             Intent intent = new Intent(this, ItemSelectionActivity.class);
@@ -259,23 +259,46 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_CODE);
         }
         else {
-            Item item = new Item(s);
-            item.setSelected(1);
-            long itemId = mItemDbAdapter.insert(item);
+            // does item already exist
+            ArrayList<String> itemNames = (ArrayList<String>) mItemDbAdapter.getAllNames();
+            Log.d(TAG, "Found:" + String.valueOf(ContainsCaseInsensitive(itemNames, itemName)));
+            boolean found = ContainsCaseInsensitive(itemNames, itemName);
 
-            // need to add aisle for every store.
-            List<Store> stores = mStoreDbAdapter.getAll();
-            for ( Store store : stores ) {
-                Aisle aisle = new Aisle();
-                aisle.setItemId(itemId);
-                aisle.setStoreId(store.getId());
-                mAisleDbAdapter.insert(aisle);
+            if ( ContainsCaseInsensitive(itemNames, itemName) ) {
+                Item item = mItemDbAdapter.getNameNoCase(itemName);
+                Log.d(TAG, "MATCHED ITEM: " + item.getName());
+                item.setSelected(1);
+                mItemDbAdapter.update(item.getId(), item);
+            }
+            else {
+                Item item = new Item(itemName);
+                item.setSelected(1);
+                long itemId = mItemDbAdapter.insert(item);
+
+                // need to add aisle for every store.
+                List<Store> stores = mStoreDbAdapter.getAll();
+                for (Store store : stores) {
+                    Aisle aisle = new Aisle();
+                    aisle.setItemId(itemId);
+                    aisle.setStoreId(store.getId());
+                    mAisleDbAdapter.insert(aisle);
+                }
             }
 
             itemEt.setText("");
-            Log.d(TAG, "Item added bout to update: " + itemId + ":" + item.getId() + ":" + item.getName());
+            //Log.d(TAG, "Item added bout to update: " + itemId + ":" + item.getId() + ":" + item.getName());
             update();
         }
+    }
+
+    public static boolean ContainsCaseInsensitive(ArrayList<String> searchList, String searchTerm)
+    {
+        for (String item : searchList)
+        {
+            if (item.equalsIgnoreCase(searchTerm))
+                return true;
+        }
+        return false;
     }
 
     @Override

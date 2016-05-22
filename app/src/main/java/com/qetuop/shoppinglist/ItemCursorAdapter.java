@@ -55,7 +55,7 @@ public class ItemCursorAdapter extends CursorAdapter {
         int     checked     = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_COMPLETED));
         String  aisleName   = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_AISLE_NAME));
         String  itemName    = cursor.getString(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ITEM_NAME));
-Log.d(TAG, "bindView: " + itemId);
+
         CheckBox itemCheckedCb  = (CheckBox) view.findViewById(R.id.row_item_checked_cb);
         TextView aisleNameTv    = (TextView) view.findViewById(R.id.row_aisle_name_tv);
         TextView itemNameTv     = (TextView) view.findViewById(R.id.row_item_name_tv);
