@@ -170,12 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "SELECT STORE");
 
                 Intent intent = new Intent(this, StoreSelectionActivity.class);
-                //intent.putExtra(EXTRA_MESSAGE, 0l);
-                //startActivity(intent);
-
                 int REQUEST_CODE = STORE_SELECTION; // set it to ??? a code to identify which activity is returning?
                 startActivityForResult(intent, REQUEST_CODE);
-
 
                 return true;
 
@@ -257,11 +253,12 @@ public class MainActivity extends AppCompatActivity {
             long id = mItemDbAdapter.insert(item);
 
             // add to aisle
-
             for ( Long tmpStoreId : storeIds ) {
+
                 String aisle_name = "";
+
                 int rand = randomGenerator.nextInt(8);
-                //Log.d(TAG, "RAND:"+ String.valueOf(rand));
+
                 if (rand == 0 ) {
                     aisle_name = "";
                 }
@@ -271,10 +268,22 @@ public class MainActivity extends AppCompatActivity {
                 else  {
                     aisle_name = String.valueOf(rand);
                 }
+
+                long tmpId = 0;
+                Store store = mStoreDbAdapter.getId(tmpStoreId);
+                String storeName = store.getName();
+                if ( storeName.equals("Giant"))
+                    tmpId = 0;
+                else
+                    tmpId = 1;
+
+
                 //Aisle aisle = new Aisle(l, item.getId(), String.valueOf(randomGenerator.nextInt(20)));
-                Aisle aisle = new Aisle(tmpStoreId, item.getId(), aisle_name);
+                //Aisle aisle = new Aisle(tmpStoreId, item.getId(), aisle_name);
+                Aisle aisle = new Aisle(tmpStoreId, item.getId(), String.valueOf(tmpId));
                 mAisleDbAdapter.insert(aisle);
-            }
+            } // for each store
+
         }
 /*
         Cursor cursor = mBaseDbAdapter.getItemAisleCursor(mStoreId);
@@ -352,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
             mStoreId = settings.getLong("storeId", 0l);
-
+Log.d(TAG, "storeId now = " + mStoreId);
             update();
         }
 
