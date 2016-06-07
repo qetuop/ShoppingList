@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "preferences";
 
     public static final int STORE_SELECTION = 1;
+    public static final int IMPORT_FILE = 2;
+    public static final int EXPORT_FILE = 3;
 
 
     // Database accessors
@@ -145,7 +147,14 @@ public class MainActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
+        Intent intent;
+        int REQUEST_CODE;
+
         switch (item.getItemId()) {
+
+
+
+
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
                 return true;
@@ -169,10 +178,25 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_select_store:
                 Log.d(TAG, "SELECT STORE");
 
-                Intent intent = new Intent(this, StoreSelectionActivity.class);
-                int REQUEST_CODE = STORE_SELECTION; // set it to ??? a code to identify which activity is returning?
+                /*intent = new Intent(this, StoreSelectionActivity.class);
+                REQUEST_CODE = STORE_SELECTION; // set it to ??? a code to identify which activity is returning?
+                startActivityForResult(intent, REQUEST_CODE);*/
+
+                //new FileSelector(FileSelectorActivity.this, FileOperation.SAVE, mSaveFileListener, mFileFilter).show();
+
+                return true;
+
+            case R.id.menu_import:
+                Log.d(TAG, "IMPORT");
+
+                intent = new Intent(this, ImportActivity.class);
+                REQUEST_CODE = IMPORT_FILE;
                 startActivityForResult(intent, REQUEST_CODE);
 
+                return true;
+
+            case R.id.menu_export:
+                Log.d(TAG, "EXPORT");
                 return true;
 
             default:
@@ -361,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
             mStoreId = settings.getLong("storeId", 0l);
-Log.d(TAG, "storeId now = " + mStoreId);
+            Log.d(TAG, "storeId now = " + mStoreId);
             update();
         }
 
