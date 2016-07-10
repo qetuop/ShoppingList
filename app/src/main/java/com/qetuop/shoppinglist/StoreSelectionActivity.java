@@ -18,9 +18,10 @@ import com.qetuop.shoppinglist.pojo.Store;
 import java.sql.SQLException;
 
 public class StoreSelectionActivity extends AppCompatActivity implements AlertDialog.OnClickListener {
-    protected static final String TAG = "ItemSelectionActivity";
+    protected static final String TAG = "StoreSelectionActivity";
 
     private AlertDialog alert;
+    private long storeId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,28 @@ public class StoreSelectionActivity extends AppCompatActivity implements AlertDi
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                Log.d(TAG, "Store selected: " );
+
+                StoreDbAdapter mStoreDbAdapter = new StoreDbAdapter(getApplicationContext());
+                try {
+                    mStoreDbAdapter.open();
+                } catch (SQLException e) {
+                    Log.e(TAG, "store table open error");
+                }
+
+                Cursor cursor = (Cursor) alert.getListView().getSelectedItem();
+                long storeId = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
+                Store store = mStoreDbAdapter.getId(id);
+                //storeId = id;
+
+                Log.d(TAG, "Store cliked: " + id + ":" + store.getName());
+
+                SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putLong("mStoreId", storeId);
+                editor.commit();
+
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -54,7 +76,7 @@ public class StoreSelectionActivity extends AppCompatActivity implements AlertDi
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                Intent intent = new Intent(getApplicationContext(),ItemSelectionActivity.class);
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 setResult(RESULT_CANCELED, intent);
                 finish();
             }
@@ -76,24 +98,8 @@ public class StoreSelectionActivity extends AppCompatActivity implements AlertDi
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
-        StoreDbAdapter mStoreDbAdapter = new StoreDbAdapter(this);
-        try {
-            mStoreDbAdapter.open();
-        } catch (SQLException e) {
-            Log.e(TAG, "store table open error");
-        }
 
-        Cursor cursor = (Cursor) alert.getListView().getAdapter().getItem(which);
-        long id = cursor.getInt(cursor.getColumnIndexOrThrow(BaseDbAdapter.COLUMN_ID));
-        Store store = mStoreDbAdapter.getId(id);
 
-        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putLong("mStoreId", id);
 
-        Log.d(TAG, "Store cliked: " + id + ":" + store.getName());
-
-        // Commit the edits!
-        editor.commit();
     }
 }

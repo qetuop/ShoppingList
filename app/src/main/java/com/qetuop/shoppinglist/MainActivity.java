@@ -15,15 +15,26 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.qetuop.shoppinglist.dbadapter.AisleDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.BaseDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.ItemDbAdapter;
 import com.qetuop.shoppinglist.dbadapter.StoreDbAdapter;
+import com.qetuop.shoppinglist.fileselector.FileOperation;
+import com.qetuop.shoppinglist.fileselector.FileSelector;
+import com.qetuop.shoppinglist.fileselector.FileSelectorActivity;
+import com.qetuop.shoppinglist.fileselector.OnHandleFileListener;
 import com.qetuop.shoppinglist.pojo.Aisle;
 import com.qetuop.shoppinglist.pojo.Item;
 import com.qetuop.shoppinglist.pojo.Store;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
     private  ListView listview;
     //private ItemCursorAdapter itemCursorAdapter;
 
-    // TODO: remove
+    // TODO: remove?
     private Long mStoreId;
+    private Boolean firstTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +72,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Restore preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        //boolean silent = settings.getBoolean("silentMode", false);
-        //setSilent(silent);
         mStoreId = settings.getLong("storeId", 0l);
 
-        // TODO: remove
-        hardcodedSetup();
+        firstTime = settings.getBoolean("firstTime", true);
+        Log.d(TAG, "first Time = " + firstTime.toString());
 
+        // TODO: remove
+        //hardcodedSetup();
+        if ( firstTime == true ) {
+            firstTime();
+        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,6 +105,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void firstTime() {
+        Store store = new Store("My Store");
+        long id = mStoreDbAdapter.insert(store);
+        mStoreId = id;
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("firstTime", false);
+        editor.putLong("storeId", mStoreId);
+
+        // Commit the edits!
+        editor.commit();
+
+    }
+
     @Override
     protected void onStop(){
         super.onStop();
@@ -107,13 +137,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void update() {
         // all
-        List<Item> objs = mItemDbAdapter.getAll();
+/*        List<Item> objs = mItemDbAdapter.getAll();
 
         Log.v(TAG,"---All Items---(mStoreId):" + mStoreId + ":" +mStoreDbAdapter.getId(mStoreId).getName());
         for (Item obj : objs) {
             Log.v(TAG, obj.getId() + " " + obj.getName() + " " + obj.getSelected());
         }
-        Log.v(TAG,"--------------");
+        Log.v(TAG,"--------------");*/
+
         //if ( itemCursorAdapter != null ) Log.d(TAG, "update, itemCursorAdapter size[1]: " + itemCursorAdapter.getCount());
         //final ListView listview = (ListView) findViewById(R.id.content_main_lv_items);
         //itemCursorAdapter.notifyDataSetChanged();
@@ -150,10 +181,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent;
         int REQUEST_CODE;
 
+        final String[] mFileFilter = {  "*.*", "*.db" }; // if*.db is listed first, won't display any
+
         switch (item.getItemId()) {
-
-
-
 
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
@@ -178,25 +208,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_select_store:
                 Log.d(TAG, "SELECT STORE");
 
-                /*intent = new Intent(this, StoreSelectionActivity.class);
+                intent = new Intent(this, StoreSelectionActivity.class);
                 REQUEST_CODE = STORE_SELECTION; // set it to ??? a code to identify which activity is returning?
-                startActivityForResult(intent, REQUEST_CODE);*/
-
-                //new FileSelector(FileSelectorActivity.this, FileOperation.SAVE, mSaveFileListener, mFileFilter).show();
-
-                return true;
-
-            case R.id.menu_import:
-                Log.d(TAG, "IMPORT");
-
-                intent = new Intent(this, ImportActivity.class);
-                REQUEST_CODE = IMPORT_FILE;
                 startActivityForResult(intent, REQUEST_CODE);
 
                 return true;
 
             case R.id.menu_export:
                 Log.d(TAG, "EXPORT");
+                new FileSelector(this, FileOperation.SAVE, mSaveFileListener, mFileFilter).show();
+                return true;
+
+            case R.id.menu_import:
+                Log.d(TAG, "IMPORT");
+                new FileSelector(this, FileOperation.LOAD, mLoadFileListener, mFileFilter).show();
                 return true;
 
             default:
@@ -204,6 +229,80 @@ public class MainActivity extends AppCompatActivity {
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    OnHandleFileListener mLoadFileListener = new OnHandleFileListener() {
+        @Override
+        public void handleFile(final String filePath) {
+            Log.d(TAG, "HEEEERRRRR");
+            Toast.makeText(getApplicationContext(), "Load: " + filePath, Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "NOW DO STUFFFF");
+            // copy the file to dir
+            String toPath = "/data/data/" + getPackageName() + "/databases/" + BaseDbAdapter.DATABASE_NAME;  // Your application path
+            copyFile(filePath, toPath);  // in -> out
+
+            // re open database
+            databaseSetup();
+        }
+    };
+
+    OnHandleFileListener mSaveFileListener = new OnHandleFileListener() {
+        @Override
+        public void handleFile(final String filePath) {
+            Toast.makeText(getApplicationContext(), "Save: " + filePath, Toast.LENGTH_SHORT).show();
+Log.d(TAG, "NOW DO STUFFFF");
+            // copy the file to current dir
+            String fromPath = "/data/data/" + getPackageName() + "/databases/" + BaseDbAdapter.DATABASE_NAME;  // Your application path
+            copyFile(fromPath, filePath); // in -> out
+        }
+    };
+
+    private void copyFile(String inputPath, String outputPath) {
+        Log.d(TAG, "IN:  " + inputPath);
+        Log.d(TAG, "OUT: " + outputPath);
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+
+            //create output directory if it doesn't exist
+           /* File dir = new File (outputPath);
+            if (!dir.exists())
+            {
+                dir.mkdirs();
+            }*/
+
+
+            in = new FileInputStream(inputPath );
+            //out = new FileOutputStream(outputPath + "/databases/" + BaseDbAdapter.DATABASE_NAME);
+            out = new FileOutputStream(outputPath);
+
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            in = null;
+
+            // write the output file
+            out.flush();
+            out.close();
+            out = null;
+
+            // delete the original file
+            //new File(inputPath + inputFile).delete();
+
+
+        }
+
+        catch (FileNotFoundException fnfe1) {
+            Log.e(TAG, fnfe1.getMessage());
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
@@ -216,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // TODO: REMOVE THIS
-        mBaseDbAdapter.removeAll();
+        //mBaseDbAdapter.removeAll();
 
         Log.v(TAG,"--------------");
 
@@ -249,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Stores
         tmp = new String[] { "Giant", "Safeway"};
-        //tmp = new String[] { "Giant"};
+        tmp = new String[] { "Giant"};
         list = new ArrayList<String>();
         list.addAll( Arrays.asList(tmp) );
         for ( String s : list ) {
@@ -375,6 +474,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult: " + requestCode +":" + resultCode);//
+
         if (resultCode == RESULT_OK && requestCode == 0) {
             Log.d(TAG, "onActivityResult");//
             update();
@@ -383,6 +484,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == STORE_SELECTION) {
             Log.d(TAG, "update store");//
 
+            // Set in the StoreSelectionActivity
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
             mStoreId = settings.getLong("storeId", 0l);
             Log.d(TAG, "storeId now = " + mStoreId);

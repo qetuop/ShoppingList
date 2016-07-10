@@ -24,7 +24,7 @@ public class BaseDbAdapter {
     private static final int DATABASE_VERSION = 10;
 
     // Database Name
-    private static final String DATABASE_NAME = "shoppingList.db";
+    public static final String DATABASE_NAME = "shoppingList.db";
 
     // Table Names
     public static final String TABLE_ITEM = "item";
